@@ -79,8 +79,9 @@ double-click. It is a single self-extracting `.bat` (~250 KB) — no
 separate `.exe` to place. The installer:
 
 - extracts the embedded binary into `%LOCALAPPDATA%\zephyrus-g14-fn-nav\`,
-- writes a tiny VBS launcher that runs the binary with a hidden window,
-- registers a Scheduled Task that fires at every user logon.
+- drops a tiny VBS launcher into the Startup folder
+  (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\`) that
+  runs the binary with a hidden window at every logon.
 
 No admin / UAC. To remove: re-run the installer and pick *Uninstall*, or
 run `install-zephyrus-g14-fn-nav-vX.Y.Z.bat --uninstall` from a terminal.

@@ -27,26 +27,10 @@ echo "%~f0" | findstr /R "[()]" >nul && (
     exit /b 1
 )
 
-:: Self-elevate to admin unless --noelevate is passed (re-entry guard).
-:: Required because schtasks /Create needs admin on locked-down systems
-:: even for current-user tasks. Once elevated, the task itself runs as
-:: the original user via /RU (set further down).
-if "%~1"=="--noelevate" shift & goto :skip_elevate
-if "%~2"=="--noelevate" goto :skip_elevate
-net session >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo Requesting administrator privileges...
-    set "_VBS=%TEMP%\zephyrus-g14-fn-nav-elevate-%RANDOM%.vbs"
-    echo Set s=CreateObject^("Shell.Application"^):s.ShellExecute "%~f0","%* --noelevate","","runas",1 > "!_VBS!"
-    wscript "!_VBS!"
-    del "!_VBS!" 2>nul
-    exit /b
-)
-:skip_elevate
-
-set "TASK_NAME=ZephyrusG14FnNav"
 set "DEST=%LOCALAPPDATA%\zephyrus-g14-fn-nav"
 set "EXE_NAME=zephyrus-g14-fn-nav.exe"
+set "STARTUP_DIR=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
+set "STARTUP_VBS=%STARTUP_DIR%\zephyrus-g14-fn-nav.vbs"
 set "TEMP_DIR=%TEMP%\zephyrus-g14-fn-nav-%RANDOM%"
 
 echo === zephyrus-g14-fn-nav installer v{APP_VERSION} ===
@@ -63,7 +47,7 @@ set "INSTALLED=0"
 if exist "%DEST%\%EXE_NAME%" set "INSTALLED=1"
 
 if "%INSTALLED%"=="1" (
-    echo Status: INSTALLED ^(at %DEST%^)
+    echo Status: INSTALLED at %DEST%
     if "%~1"=="--status" exit /b 0
     echo(
     echo [1] Uninstall
@@ -93,6 +77,7 @@ if "%INSTALLED%"=="1" (
 taskkill /F /IM "%EXE_NAME%" >nul 2>&1
 
 if not exist "%DEST%" mkdir "%DEST%"
+if not exist "%STARTUP_DIR%" mkdir "%STARTUP_DIR%"
 mkdir "%TEMP_DIR%" 2>nul
 
 :: Extract the embedded base64 payload between markers (same idiom as the
@@ -126,37 +111,29 @@ if not exist "%DEST%\%EXE_NAME%" (
     exit /b 1
 )
 
-:: Write the hidden-window VBS launcher next to the .exe
-> "%DEST%\start.vbs" echo Set sh = CreateObject("WScript.Shell")
->> "%DEST%\start.vbs" echo sh.Run """%DEST%\%EXE_NAME%""", 0, False
-
-:: Register the Scheduled Task: run at this user's logon, hidden via VBS.
-:: /RU restricts the trigger to the current user; without it, ONLOGON
-:: means "any user logs in" which requires admin to create.
-schtasks /Create /TN "%TASK_NAME%" /TR "wscript.exe \"%DEST%\start.vbs\"" /SC ONLOGON /RU "%USERNAME%" /F >nul
-if errorlevel 1 (
-    echo [ERROR] schtasks /Create failed.
-    rmdir /S /Q "%TEMP_DIR%" 2>nul
-    pause
-    exit /b 1
-)
+:: Write the hidden-window VBS launcher directly into the Startup folder.
+:: Windows runs .vbs files in the Startup folder at every user logon
+:: (no Scheduled Task, no admin / UAC).
+> "%STARTUP_VBS%" echo Set sh = CreateObject("WScript.Shell")
+>> "%STARTUP_VBS%" echo sh.Run """%DEST%\%EXE_NAME%""", 0, False
 
 :: Cleanup temp
 rmdir /S /Q "%TEMP_DIR%" 2>nul
 
 :: Start it now so the user doesn't need to log out
-wscript.exe "%DEST%\start.vbs"
+wscript.exe "%STARTUP_VBS%"
 
 echo(
 echo [OK] Installed. Listener will auto-start at every logon.
-echo      Task: %TASK_NAME%   Location: %DEST%
+echo      Binary: %DEST%\%EXE_NAME%
+echo      Autostart: %STARTUP_VBS%
 if "%~1"=="" pause
 exit /b 0
 
 :uninstall
-echo Stopping listener and removing scheduled task...
+echo Stopping listener and removing autostart entry...
 taskkill /F /IM "%EXE_NAME%" >nul 2>&1
-schtasks /Delete /TN "%TASK_NAME%" /F >nul 2>&1
+if exist "%STARTUP_VBS%" del /F /Q "%STARTUP_VBS%"
 if exist "%DEST%" rmdir /S /Q "%DEST%"
 echo(
 echo [OK] Uninstalled.

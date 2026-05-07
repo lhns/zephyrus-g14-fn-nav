@@ -23,7 +23,7 @@ jobs:
       - name: Build release binary
         run: cargo build --release --locked
 
-      - name: Upload workflow artifact
+      - name: Upload exe artifact
         uses: actions/upload-artifact@v4
         with:
           name: zephyrus-g14-fn-nav-windows-x86_64
@@ -31,13 +31,23 @@ jobs:
           if-no-files-found: error
 
       - name: Package self-extracting installer
-        if: github.event_name == 'release'
         shell: bash
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          python scripts/package.py \
-            --exe target/release/zephyrus-g14-fn-nav.exe \
-            --version "$VERSION"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            python scripts/package.py \
+              --exe target/release/zephyrus-g14-fn-nav.exe \
+              --version "${GITHUB_REF_NAME#v}"
+          else
+            python scripts/package.py \
+              --exe target/release/zephyrus-g14-fn-nav.exe
+          fi
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-bat
+          path: install*.bat
+          if-no-files-found: error
 
       - name: Attach to GitHub Release
         if: github.event_name == 'release'

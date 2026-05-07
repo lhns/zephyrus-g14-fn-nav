@@ -13,5 +13,5 @@ write a new ADR that supersedes the old one rather than rewriting history.
 | 0005 | [No client-side auto-repeat in v1](0005-no-auto-repeat-in-v1.md) | Accepted |
 | 0006 | [Fn+Up/Down emits PgUp/PgDn + restores brightness; Ctrl+Fn+Up/Down is the only intentional brightness control](0006-fn-updown-pgup-and-brightness-restore.md) | Accepted |
 | 0007 | [Track keyboard brightness as in-process state, not by reading from hardware](0007-state-tracking-for-brightness.md) | Accepted |
-| 0008 | [Auto-start via Scheduled Task at user logon, not a Windows Service](0008-scheduled-task-not-windows-service.md) | Accepted |
+| 0008 | [Auto-start via the Startup folder, not a Windows Service or Scheduled Task](0008-startup-folder-not-windows-service.md) | Accepted |
 | 0009 | [Distribute via a single self-extracting `.bat` with embedded base64-encoded binary](0009-self-extracting-bat-installer.md) | Accepted |
