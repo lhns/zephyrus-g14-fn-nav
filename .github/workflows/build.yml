@@ -34,23 +34,23 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
-            python scripts/package.py \
-              --exe target/release/zephyrus-g14-fn-nav.exe \
-              --version "${GITHUB_REF_NAME#v}"
+            VERSION="${GITHUB_REF_NAME}"
           else
-            python scripts/package.py \
-              --exe target/release/zephyrus-g14-fn-nav.exe
+            VERSION="dev-${GITHUB_SHA:0:7}"
           fi
+          python scripts/package.py \
+            --exe target/release/zephyrus-g14-fn-nav.exe \
+            --version "$VERSION"
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: install-bat
-          path: install*.bat
+          path: install-zephyrus-g14-fn-nav-*.bat
           if-no-files-found: error
 
       - name: Attach to GitHub Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: install-zephyrus-g14-fn-nav-v*.bat
+          files: install-zephyrus-g14-fn-nav-*.bat

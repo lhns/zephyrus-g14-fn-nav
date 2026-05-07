@@ -389,10 +389,11 @@ def main() -> int:
 
     if args.output:
         out = Path(args.output)
-    elif args.version != "dev":
-        out = Path(f"install-zephyrus-g14-fn-nav-v{args.version}.bat")
     else:
-        out = Path("install.bat")
+        # Always include the project name. The version string is used
+        # verbatim so the caller controls any prefix (e.g. "v0.1.0" for
+        # release tags, "dev-1d8a0fd" for CI builds).
+        out = Path(f"install-zephyrus-g14-fn-nav-{args.version}.bat")
 
     out.write_text(bat, encoding="ascii", newline="\r\n")
     print(

@@ -109,7 +109,7 @@ cross-mode leftovers. UAC fires only if a Scheduled Task or a
 | Mode-2 / Mode-3 menu selection  | Once, *after* the user picks the option |
 | `--uninstall` of mode-1 install | Never |
 | `--uninstall` of mode-2 / 3     | Once |
-| Re-running an already-installed install.bat | Never (status check is read-only) |
+| Re-running an already-installed installer | Never (status check is read-only) |
 
 The lazy-elevation rule: UAC fires only when the chosen action genuinely
 needs admin. Mode 1 stays admin-free end to end. The interactive menu
@@ -155,8 +155,14 @@ cargo build --release
 python scripts/package.py --exe target/release/zephyrus-g14-fn-nav.exe
 ```
 
-Produces `install.bat` at the repo root. Pass `--version 0.1.0` to get
-a versioned filename (`install-zephyrus-g14-fn-nav-v0.1.0.bat`).
+Produces `install-zephyrus-g14-fn-nav-dev.bat` at the repo root. Pass
+a `--version` to get a different suffix:
+
+- `--version v0.1.0` → `install-zephyrus-g14-fn-nav-v0.1.0.bat`
+  (matches the release-build format).
+- `--version dev-$(git rev-parse --short HEAD)` →
+  `install-zephyrus-g14-fn-nav-dev-1d8a0fd.bat` (matches the CI-build
+  format).
 
 The packager embeds two base64 payloads in the output `.bat`: the .exe
 itself, and the `task.xml` for mode 3. Both are decoded at runtime via
