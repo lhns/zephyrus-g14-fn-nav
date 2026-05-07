@@ -20,17 +20,8 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      - name: Build release binary
-        run: cargo build --release --locked
-
-      - name: Upload exe artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: zephyrus-g14-fn-nav-windows-x86_64
-          path: target/release/zephyrus-g14-fn-nav.exe
-          if-no-files-found: error
-
-      - name: Package self-extracting installer
+      - name: Compute version
+        id: version
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "release" ]; then
@@ -38,14 +29,29 @@ jobs:
           else
             VERSION="dev-${GITHUB_SHA:0:7}"
           fi
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build release binary
+        run: cargo build --release --locked
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zephyrus-g14-fn-nav-${{ steps.version.outputs.VERSION }}-x86_64
+          path: target/release/zephyrus-g14-fn-nav.exe
+          if-no-files-found: error
+
+      - name: Package self-extracting installer
+        shell: bash
+        run: |
           python scripts/package.py \
             --exe target/release/zephyrus-g14-fn-nav.exe \
-            --version "$VERSION"
+            --version "${{ steps.version.outputs.VERSION }}"
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: install-bat
+          name: zephyrus-g14-fn-nav-installer-${{ steps.version.outputs.VERSION }}
           path: install-zephyrus-g14-fn-nav-*.bat
           if-no-files-found: error
 
