@@ -73,14 +73,21 @@ debuggability.
 
 ## Auto-start at login
 
-Drop a shortcut to the binary into:
+Download the installer from the latest
+[Release](https://github.com/lhns/zephyrus-g14-fn-nav/releases) and
+double-click. It is a single self-extracting `.bat` (~250 KB) — no
+separate `.exe` to place. The installer:
 
-```
-%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup
-```
+- extracts the embedded binary into `%LOCALAPPDATA%\zephyrus-g14-fn-nav\`,
+- writes a tiny VBS launcher that runs the binary with a hidden window,
+- registers a Scheduled Task that fires at every user logon.
 
-Windows will launch it on every sign-in. No services, no scheduled tasks,
-no admin elevation.
+No admin / UAC. To remove: re-run the installer and pick *Uninstall*, or
+run `install-zephyrus-g14-fn-nav-vX.Y.Z.bat --uninstall` from a terminal.
+
+> **Build-from-source path:** after `cargo build --release`, run
+> `python scripts/package.py --exe target/release/zephyrus-g14-fn-nav.exe`
+> to produce `install.bat` at the repo root.
 
 ## Brightness behaviour
 

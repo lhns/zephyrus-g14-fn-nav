@@ -1,6 +1,9 @@
 # Rust build artifacts
 /target
 
+# Packaged installers (build output of scripts/package.py)
+/install*.bat
+
 # Python diagnostic harness
 /diagnostic/.venv
 /diagnostic/__pycache__

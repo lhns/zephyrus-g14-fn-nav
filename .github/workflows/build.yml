@@ -30,8 +30,17 @@ jobs:
           path: target/release/zephyrus-g14-fn-nav.exe
           if-no-files-found: error
 
+      - name: Package self-extracting installer
+        if: github.event_name == 'release'
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          python scripts/package.py \
+            --exe target/release/zephyrus-g14-fn-nav.exe \
+            --version "$VERSION"
+
       - name: Attach to GitHub Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          files: target/release/zephyrus-g14-fn-nav.exe
+          files: install-zephyrus-g14-fn-nav-v*.bat
