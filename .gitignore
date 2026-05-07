@@ -1,0 +1,22 @@
+# Rust build artifacts
+/target
+
+# Python diagnostic harness
+/diagnostic/.venv
+/diagnostic/__pycache__
+/diagnostic/*.tmp
+
+# Diagnostic captures (machine-specific, contain raw keypress timing)
+/diagnostic/capture*.log
+
+# IDE / editor
+/.vscode
+/.idea
+*.swp
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Claude Code per-machine settings
+/.claude/

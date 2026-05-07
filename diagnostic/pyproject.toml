@@ -1,0 +1,16 @@
+[project]
+name = "g14-fn-diagnostic"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Pierre Kisters", email = "pierrekisters@gmail.com" }
+]
+dependencies = [
+    "pywinusb>=0.4.2",
+]
+requires-python = ">= 3.8"
+
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = []
