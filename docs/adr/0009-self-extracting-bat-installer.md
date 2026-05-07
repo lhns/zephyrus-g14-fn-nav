@@ -39,6 +39,14 @@ format (76-char lines, BEGIN/END CERTIFICATE markers), and writes the
 output `.bat` with **CRLF line endings + ASCII encoding** so `cmd.exe`
 parses it cleanly.
 
+**Two payloads** are embedded in the same .bat (added when ADR 0008
+gained mode 3): the .exe itself between `::PAYLOAD_START` /
+`::PAYLOAD_END`, and the system-wide task `task.xml` (UTF-16 LE with
+BOM, as required by Task Scheduler) between `::TASK_XML_START` /
+`::TASK_XML_END`. Both use the same PEM-wrapped base64 envelope and
+the same `certutil -decode` extraction idiom. The XML is only decoded
+when the user picks Mode 3; for Modes 1 and 2 the bytes sit unread.
+
 The CI workflow runs the packager only on `release: published` events
 and uploads the resulting versioned `.bat` as the sole release asset.
 The loose `.exe` continues to be uploaded as a per-commit workflow

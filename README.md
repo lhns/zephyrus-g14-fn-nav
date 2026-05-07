@@ -75,20 +75,24 @@ debuggability.
 
 Download the installer from the latest
 [Release](https://github.com/lhns/zephyrus-g14-fn-nav/releases) and
-double-click. It is a single self-extracting `.bat` (~250 KB) — no
-separate `.exe` to place. The installer:
+double-click. It's a single self-extracting `.bat` (~250 KB) with the
+binary embedded — no separate `.exe` to place.
 
-- extracts the embedded binary into `%LOCALAPPDATA%\zephyrus-g14-fn-nav\`,
-- drops a tiny VBS launcher into the Startup folder
-  (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\`) that
-  runs the binary with a hidden window at every logon.
+The installer offers three modes:
 
-No admin / UAC. To remove: re-run the installer and pick *Uninstall*, or
-run `install-zephyrus-g14-fn-nav-vX.Y.Z.bat --uninstall` from a terminal.
+| # | Mode                                          | Admin? | Scope                |
+| - | --------------------------------------------- | ------ | -------------------- |
+| 1 | Install for current user (Startup folder)     | No     | This user only       |
+| 2 | Install for current user (Scheduled Task)     | Yes    | This user only       |
+| 3 | Install system wide (Scheduled Task)          | Yes    | Every user on the PC |
 
-> **Build-from-source path:** after `cargo build --release`, run
-> `python scripts/package.py --exe target/release/zephyrus-g14-fn-nav.exe`
-> to produce `install.bat` at the repo root.
+Pick mode 1 if you want zero UAC. Pick mode 2 for Task Scheduler
+manageability. Pick mode 3 on a multi-user laptop. To remove: re-run
+the installer and pick *Uninstall*.
+
+See [`docs/installer.md`](docs/installer.md) for the full installer
+documentation — file locations per mode, CLI reference, status output,
+troubleshooting, build-from-source.
 
 ## Brightness behaviour
 
